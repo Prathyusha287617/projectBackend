@@ -10,7 +10,11 @@ import {
   getProductsByBrand,
   getProductsByCategory,
   getBrandsByBranch,
-  getCategoriesByBranchAndBrand
+  getCategoriesByBranchAndBrand,
+  updateProductQuantity,
+  triggerRestockRequest,
+  updateProductDetails,
+  getProductsByBranch
 } from '../controller/productController';
 
 const router = express.Router();
@@ -26,6 +30,13 @@ router.get('/category/:category', getProductsByCategory as any); // Get products
 
 router.get('/brands/branch/:branchShortId', getBrandsByBranch);
 router.get('/categories/branch/:branchShortId/brand/:brandName', getCategoriesByBranchAndBrand);
+
+router.put('/products/:productShortId/quantity', updateProductQuantity as any);
+router.post('/products/:productShortId/restock', triggerRestockRequest as any);
+router.put('/products/:productShortId', updateProductDetails as any);
+
+router.get('/branch/:branchShortId', getProductsByBranch as any);
+
 /*
 router.post('/', createProduct);
 router.get('/', getAllProducts);

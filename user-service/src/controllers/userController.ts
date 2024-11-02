@@ -20,10 +20,18 @@ export const register = async (req: Request, res: Response) => {
     }
 
     // Validate the role
-    const validRoles = ['branch_retailer', 'business_retailer', 'admin'];
+    const validRoles = ['branch_retailer', 'business_retailer', 'admin','sales_rep'];
     if (!validRoles.includes(role)) {
         return res.status(400).json({ message: `Role must be one of: ${validRoles.join(', ')}` });
     }
+
+    // Handle branchShortId based on role
+if (role !== 'business_retailer' && role !== 'admin' && !branchShortId) {
+    return res.status(400).json({ message: 'BranchShortId is required for this role.' });
+} else if (role === 'business_retailer' || role === 'admin') {
+    // Set branchShortId to null if the user is a business retailer or an admin
+    req.body.branchShortId = null;
+}
 
 
     // Check if the user already exists
@@ -68,7 +76,7 @@ export const login = async (req: Request, res: Response) => {
 
     const token = jwt.sign({ id: user._id, role: user.role, branchShortId:user.branchShortId }, process.env.JWT_SECRET || '', { expiresIn: '1h' });
     
-    res.json({ token,branchShortId: user.branchShortId });
+    res.json({ token,branchShortId: user.branchShortId,role: user.role });
 };
 
 // Get branch-specific data

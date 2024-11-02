@@ -9,7 +9,8 @@ async function syncCounter() {
       .sort({ productShortId: -1 })
       .exec();
 
-    if (lastProduct) {
+    // Check if lastProduct is found
+    if (lastProduct && lastProduct.productShortId) {
       const lastCounterValue = parseInt(lastProduct.productShortId.split('-')[1], 10);
 
       // Update the counter if the last recorded value is higher
@@ -18,10 +19,11 @@ async function syncCounter() {
         { $max: { value: lastCounterValue } }, // Ensures the counter never goes below the current max
         { upsert: true }
       );
+    } else {
+      console.log('No products found, skipping counter synchronization.');
     }
   } catch (error) {
     console.error('Error synchronizing counter:', error);
   }
 }
-
 export default syncCounter;

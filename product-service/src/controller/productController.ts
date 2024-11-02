@@ -3,6 +3,25 @@ import { Request, Response } from 'express';
 import Product from '../models/productModel';
 import axios from 'axios';
 
+// Controller to fetch products by branchShortId
+export const getProductsByBranch = async (req: Request, res: Response) => {
+  try {
+      const { branchShortId } = req.params;
+
+      // Find products with the specified branchShortId
+      const products = await Product.find({ branchShortId });
+
+      if (!products.length) {
+          return res.status(404).json({ message: 'No products found for this branch.' });
+      }
+
+      res.json(products);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
+  }
+};
+
 // Function to fetch all unique brand names based on branchShortId
 export const getBrandsByBranch = async (req: Request, res: Response) => {
   const { branchShortId } = req.params;
@@ -31,6 +50,65 @@ export const getCategoriesByBranchAndBrand = async (req: Request, res: Response)
     res.status(500).json({ message: 'Error fetching categories', error });
   }
 };
+
+// Update product quantity (for restocking purposes)
+export async function updateProductQuantity(req: Request, res: Response) {
+  const { productShortId } = req.params;
+  const { quantity } = req.body;
+  try {
+    const product = await Product.findOne({ productShortId });
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    product.productQuantity = quantity;
+    await product.save();
+    res.json({ message: 'Product quantity updated', product });
+  } catch (error:any) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+// Trigger a manual restock request (for managers only)
+export async function triggerRestockRequest(req: Request, res: Response) {
+  const { productShortId } = req.params;
+  try {
+    const product = await Product.findOne({ productShortId });
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    product.needsRestock = true; // Mark as needing restock
+    await product.save();
+    res.json({ message: 'Restock request triggered', product });
+  } catch (error:any) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+// Update product details (e.g., for price adjustments)
+export async function updateProductDetails(req: Request, res: Response) {
+  const { productShortId } = req.params;
+  const { sellingPrice, actualPrice, ...otherDetails } = req.body;
+  try {
+    const product = await Product.findOne({ productShortId });
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    if (sellingPrice && actualPrice) {
+      product.sellingPrice = sellingPrice;
+      product.actualPrice = actualPrice;
+      product.profit = sellingPrice - actualPrice; // Calculate profit
+    }
+
+    Object.assign(product, otherDetails);
+    await product.save();
+    res.json({ message: 'Product details updated', product });
+  } catch (error:any) {
+    res.status(500).json({ error: error.message });
+  }
+}
 
 // Create a new product
 export const createProduct = async (req: Request, res: Response) => {
