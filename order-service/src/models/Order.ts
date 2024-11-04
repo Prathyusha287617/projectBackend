@@ -1,27 +1,26 @@
 // src/models/Order.ts
 import mongoose, { Document, Schema } from 'mongoose';
+import Counter from './counter';
 
 export interface IOrder extends Document {
   orderShortID: string;
-  customerId: string;  // Reference to Customer ID
+  customerShortId: string;
   branchShortId: string;
-  productId: string;
+  productShortId: string;
   quantity: number;
   totalPrice: number;
   orderDate: Date;
   transactionStatus: 'Pending' | 'Completed' | 'Cancelled';
-  createdAt?: Date;
-  updatedAt?: Date;
+
 }
 
 const orderSchema = new Schema<IOrder>(
   {
     orderShortID: {
       type: String,
-      required: true,
       unique: true,
     },
-    customerId: {
+    customerShortId: {
       type: String,
       required: true,
     },
@@ -29,7 +28,7 @@ const orderSchema = new Schema<IOrder>(
       type: String,
       required: true,
     },
-    productId: {
+    productShortId: {
       type: String,
       required: true,
     },
@@ -53,6 +52,24 @@ const orderSchema = new Schema<IOrder>(
   },
   { timestamps: true }
 );
+
+// Pre-save middleware to generate unique orderShortID if not present
+orderSchema.pre<IOrder>('save', async function (next) {
+  try {
+    // Generate unique orderShortID if not present
+    if (!this.orderShortID) {
+      const counter = await Counter.findOneAndUpdate(
+        { name: 'orderCounter' },
+        { $inc: { value: 1 } },
+        { new: true, upsert: true }
+      );
+      this.orderShortID = `ORD-${counter.value.toString().padStart(4, '0')}`;
+    }
+    next();
+  } catch (error:any) {
+    next(error);
+  }
+});
 
 const Order = mongoose.model<IOrder>('Order', orderSchema);
 export default Order;

@@ -14,10 +14,16 @@ import {
   updateProductQuantity,
   triggerRestockRequest,
   updateProductDetails,
-  getProductsByBranch
+  getProductsByBranch,
+  getProductByHeaderShortId,
+  updateProductStockQuantity
 } from '../controller/productController';
 
 const router = express.Router();
+
+router.get('/id', getProductByHeaderShortId as any);
+router.put('/shortId/:productShortId', updateProductQuantity as any);
+router.put('/:productShortId', updateProductStockQuantity as any);
 
 router.post('/', createProduct); // Create a new product
 router.get('/', getAllProducts); // Get all products
@@ -36,6 +42,8 @@ router.post('/products/:productShortId/restock', triggerRestockRequest as any);
 router.put('/products/:productShortId', updateProductDetails as any);
 
 router.get('/branch/:branchShortId', getProductsByBranch as any);
+// Route to get a product by short ID from headers
+
 
 /*
 router.post('/', createProduct);

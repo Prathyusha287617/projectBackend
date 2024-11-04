@@ -1,6 +1,29 @@
 import { Request, Response } from 'express';
 import Branch from '../models/branchModel';
 
+export const getBranchByLocation = async (req: Request, res: Response) => {
+    try {
+      // Get branchLocation from query parameters
+      const { branchLocation } = req.query;
+  
+      if (!branchLocation) {
+        return res.status(400).json({ message: 'branchLocation query parameter is required.' });
+      }
+  
+      // Fetch branch details by branchLocation
+      const branches = await Branch.find({ branchLocation: branchLocation });
+  
+      if (branches.length === 0) {
+        return res.status(404).json({ message: 'No branches found for the specified location.' });
+      }
+  
+      res.status(200).json(branches);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error', error });
+    }
+  };
+  
+
 // Create a branch
 export const createBranch = async (req: Request, res: Response): Promise<void> => {
     try {

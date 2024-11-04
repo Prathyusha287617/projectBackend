@@ -3,26 +3,23 @@ import { Request, Response } from 'express';
 import Order from '../models/Order';
 import { getCustomerByShortId } from '../service/customerServiceClient'; // Import the updated customer service client
 
-// Create an order
+// Create Order Controller
 export const createOrder = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { customerShortId, ...orderDetails } = req.body;
+  try {
+    const orderData = req.body;
 
-        // Fetch customer details using customerShortId
-        const customer = await getCustomerByShortId(customerShortId);
-        if (!customer) {
-            res.status(404).json({ message: 'Customer not found' });
-            return;
-        }
+    // Create a new order instance
+    const order = new Order(orderData);
 
-        // Proceed to create order
-        const newOrder = new Order({ ...orderDetails, customerId: customer.customerShortId, branchShortId: customer.branchShortId }); // Set customerId from fetched customer
-        await newOrder.save();
-        res.status(201).json(newOrder);
-    } catch (error) {
-        console.error("Order creation error:", error);
-        res.status(500).json({ message: 'Error creating order', error });
-    }
+    // Save the order to the database
+    await order.save();
+
+    // Respond with a success message
+    res.status(201).json({ message: 'Order created successfully!', order });
+  } catch (error) {
+    console.error('Error creating order:', error);
+    res.status(500).json({ message: 'An error occurred while creating the order.' });
+  }
 };
 
 

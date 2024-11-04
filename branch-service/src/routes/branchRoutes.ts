@@ -8,9 +8,13 @@ import {
     updateBranchByShortId,
     deleteBranchById,
     deleteBranchByShortId,
+    getBranchByLocation,
 } from '../controllers/branchController';
 
 const router = express.Router();
+
+// Route to get branch details by branch location
+router.get('/location', getBranchByLocation as any);
 
 // Create a branch
 router.post('/', createBranch);

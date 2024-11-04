@@ -25,6 +25,7 @@
     "@babel/preset-env": "^7.26.0",
     "@babel/preset-react": "^7.25.9",
     "@babel/preset-typescript": "^7.26.0",
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/mongoose": "^5.11.97",
     "@types/node": "^22.8.1",

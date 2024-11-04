@@ -4,11 +4,9 @@ import Counter from './counter';
 interface IBranch extends Document {
   branchLocation: string;
   branchRegion: string;
-  branchMobileNumber:number,
-  branchEmail:string,
+  branchMobileNumber: number;
+  branchEmail: string;
   branchShortId: string;
-  createdAt?: Date;
-  updatedAt?: Date;
 }
 
 const branchSchema = new Schema<IBranch>(
@@ -21,14 +19,14 @@ const branchSchema = new Schema<IBranch>(
       type: String,
       required: true,
     },
-    branchMobileNumber:{
-        type: Number,
-        required: true,
+    branchMobileNumber: {
+      type: Number,
+      required: true,
     },
     branchEmail: {
-        type: String,
-        required: true,
-        unique: true,
+      type: String,
+      required: true,
+      unique: true,
     },
     branchShortId: {
       type: String,
@@ -40,21 +38,21 @@ const branchSchema = new Schema<IBranch>(
 
 branchSchema.pre<IBranch>('save', async function (next) {
   try {
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-    const shortName = "unq";
+    const prefix = "PAI";
 
+    // Retrieve and increment the counter value for branchShortId generation
     const counter = await Counter.findOneAndUpdate(
       { name: 'branchCounter' },
       { $inc: { value: 1 } },
       { new: true, upsert: true }
     );
 
-    this.branchShortId = `${year}${shortName}${counter.value.toString().padStart(4, '0')}`;
+    // Format branchShortId as "PAI" + counter padded to three digits
+    this.branchShortId = `${prefix}${counter.value.toString().padStart(3, '0')}`;
     console.log('Generated Custom ID for Branch:', this.branchShortId);
 
     next();
-  } catch (error:any) {
+  } catch (error: any) {
     next(error);
   }
 });

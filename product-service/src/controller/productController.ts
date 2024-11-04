@@ -3,6 +3,66 @@ import { Request, Response } from 'express';
 import Product from '../models/productModel';
 import axios from 'axios';
 
+export const updateProductStockQuantity = async (req: Request, res: Response) => {
+  const { productShortId } = req.params; // Get the productShortId from the request parameters
+  const { quantity } = req.body; // Get the quantity to reduce from the request body
+
+  try {
+    // Find the product by its short ID
+    const product = await Product.findOne({ productShortId });
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    // Calculate the new quantity based on the current quantity and the quantity to reduce
+    const newQuantity = product.productQuantity - quantity;
+
+    // Ensure the new quantity is not negative
+    if (newQuantity < 0) {
+      return res.status(400).json({ error: 'Insufficient stock for this product' });
+    }
+
+    // Update the product quantity
+    product.productQuantity = newQuantity;
+
+    // Save the updated product to the database
+    const updatedProduct = await product.save();
+
+    // Respond with the updated product information
+    res.status(200).json({ message: 'Product quantity updated', updatedProduct });
+  } catch (error: any) {
+    // Handle errors appropriately
+    res.status(500).json({ message: 'Error updating product', error: error.message });
+  }
+};
+
+export const updateProductQuantity = async (req: Request, res: Response) => {
+  const { productShortId } = req.params; // Get the productShortId from the request parameters
+ 
+  try {
+    // Find the product by its short ID
+    const product = await Product.findOne({ productShortId });
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+ 
+    // Calculate the new quantity based on the current quantity and restock quantity
+    const newQuantity = product.productQuantity + product.restockQuantity;
+ 
+    // Update the product quantity
+    product.productQuantity = newQuantity;
+ 
+    // Save the updated product to the database
+    const updatedProduct = await product.save();
+ 
+    // Respond with the updated product information
+    res.status(200).json({ message: 'Product quantity updated', updatedProduct });
+  } catch (error:any) {
+    // Handle errors appropriately
+    res.status(500).json({ message: 'Error updating product', error: error.message });
+  }
+};
+
 // Controller to fetch products by branchShortId
 export const getProductsByBranch = async (req: Request, res: Response) => {
   try {
@@ -50,24 +110,6 @@ export const getCategoriesByBranchAndBrand = async (req: Request, res: Response)
     res.status(500).json({ message: 'Error fetching categories', error });
   }
 };
-
-// Update product quantity (for restocking purposes)
-export async function updateProductQuantity(req: Request, res: Response) {
-  const { productShortId } = req.params;
-  const { quantity } = req.body;
-  try {
-    const product = await Product.findOne({ productShortId });
-    if (!product) {
-      return res.status(404).json({ error: 'Product not found' });
-    }
-
-    product.productQuantity = quantity;
-    await product.save();
-    res.json({ message: 'Product quantity updated', product });
-  } catch (error:any) {
-    res.status(500).json({ error: error.message });
-  }
-}
 
 // Trigger a manual restock request (for managers only)
 export async function triggerRestockRequest(req: Request, res: Response) {
@@ -156,6 +198,31 @@ export const getProductByShortId = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error fetching product', error });
   }
 };
+
+// Get a single product by productShortId from query parameters
+export const getProductByHeaderShortId = async (req: Request, res: Response) => {
+  try {
+    const productShortId = req.query.productShortId as string;
+
+    // Check if productShortId is provided
+    if (!productShortId) {
+      return res.status(400).json({ message: 'Product short ID is required' });
+    }
+
+    console.log('Searching for product with short ID:', productShortId); // Debugging log
+
+    // Find the product using productShortId
+    const product = await Product.findOne({ productShortId });
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching product', error });
+  }
+};
+
 
 // Update a product by ID
 export const updateProduct = async (req: Request, res: Response) => {
