@@ -1,6 +1,6 @@
 // src/models/Order.ts
 import mongoose, { Document, Schema } from 'mongoose';
-import Counter from './counter';
+import Counter from './OrderCounter';
 
 export interface IOrder extends Document {
   orderShortID: string;

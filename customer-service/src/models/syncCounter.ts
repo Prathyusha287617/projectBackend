@@ -1,6 +1,6 @@
 // src/utils/syncCustomerCounter.ts
 import Customer from '../models/customer';
-import Counter from '../models/counter';
+import Counter from './CustomerCounter';
 
 async function syncCounter() {
   try {

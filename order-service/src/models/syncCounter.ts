@@ -1,6 +1,6 @@
 // src/utils/syncOrderCounter.ts
 import Order from '../models/Order';
-import Counter from '../models/counter';
+import Counter from './OrderCounter';
 
 async function syncCounter() {
   try {

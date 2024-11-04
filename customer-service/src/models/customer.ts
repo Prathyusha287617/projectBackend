@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import Counter from './counter';
+import Counter from './CustomerCounter';
 
 // Define the ICustomer interface
 interface ICustomer extends Document {
