@@ -8,13 +8,15 @@ import {
     deleteCustomerByShortId,
    getCustomerOrders,
    checkCustomerByEmail,
-   addCustomerByEmail
+   addCustomerByEmail,
+   getTotalCustomers
 } from '../controller/customerController'; // Adjust the import according to your folder structure
  
 const customerRouter = Router();
  
- customerRouter.get('/checkCustomer',checkCustomerByEmail as any);
- customerRouter.post('/addCustomer', addCustomerByEmail);
+customerRouter.get('/count/:branchShortId', getTotalCustomers);
+customerRouter.get('/checkCustomer',checkCustomerByEmail as any);
+customerRouter.post('/addCustomer', addCustomerByEmail);
 customerRouter.post('/', createCustomer); // Create a new customer
 customerRouter.get('/shortId/:shortId', getCustomerByShortId); // Get a customer by customerShortId
 customerRouter.get('/:id', getCustomerById); // Get a customer by MongoDB ObjectId

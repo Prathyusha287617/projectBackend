@@ -3,6 +3,17 @@ import Customer from '../models/customer'; // Adjust the import according to you
 import { getOrdersByCustomerShortId } from '../services/orderServiceClient'; // Adjust the import according to your folder structure
 import axios from 'axios';
  
+export const getTotalCustomers = async (req: Request, res: Response) => {
+    const { branchShortId } = req.params;
+  
+    try {
+      const totalCustomers = await Customer.countDocuments({ branchShortId });
+      res.json({ totalCustomers });
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching total customers', error });
+    }
+  };
+
 // 1. Create a Customer
 export const createCustomer = async (req: Request, res: Response): Promise<void> => {
     try {

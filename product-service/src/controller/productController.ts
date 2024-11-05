@@ -3,6 +3,88 @@ import { Request, Response } from 'express';
 import Product from '../models/productModel';
 import axios from 'axios';
 
+
+export const getTotalProducts = async (req: Request, res: Response) => {
+  const { branchShortId } = req.params;
+
+  try {
+    const totalProducts = await Product.countDocuments({ branchShortId });
+    res.json({ totalProducts });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching total products', error });
+  }
+};
+
+// Function to get product count for each brand in a specific branch
+export const getProductCountByBrandAndBranch = async (req: Request, res: Response) => {
+  const { branchShortId, brandName } = req.params;
+
+  try {
+    const count = await Product.countDocuments({ branchShortId, brandName });
+    res.status(200).json(count);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching product count', error });
+  }
+};
+
+// Endpoint to fetch all productShortIds and productNames
+export const getAllProductShortIds = async (req: Request, res: Response) => {
+  try {
+    // Fetch only productShortId and productName for all products
+    const products = await Product.find({}, 'productShortId productName').exec();
+    
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching product IDs', error });
+  }
+};
+
+// productController.ts
+export const getProductQuantityHistory = async (req: Request, res: Response) => {
+  const { productShortId } = req.params;
+
+  try {
+    const history = await Product.aggregate([
+      { $match: { productShortId } },
+      { $project: { date: "$createdAt", quantity: "$productQuantity" } },
+      { $sort: { date: 1 } } // Sort by date
+    ]);
+
+    if (history.length === 0) {
+      return res.status(404).json({ message: 'No quantity history found for this product.' });
+    }
+
+    res.json(history);
+  } catch (error:any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Controller function to get historical product quantity data
+export const getQuantityHistory = async (req: Request, res: Response) => {
+  try {
+    const { productShortId } = req.params;
+
+    // Find the product by its productShortId
+    const product = await Product.findOne({ productShortId });
+    
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    // Assuming you have a history collection or have recorded timestamps in your Product
+    const history = await Product.aggregate([
+      { $match: { productShortId } },
+      { $project: { timestamps: "$createdAt", productQuantity: 1 } },
+      { $sort: { timestamps: 1 } } // Sort by time
+    ]);
+
+    res.json(history);
+  } catch (error:any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Fetch all products if the user is a business retailer
 export const getAllProductsForBusinessRetailer = async (req: Request, res: Response) => {
   try {
@@ -51,6 +133,7 @@ export const updateProductStockQuantity = async (req: Request, res: Response) =>
 
 export const updateProductQuantity = async (req: Request, res: Response) => {
   const { productShortId } = req.params; // Get the productShortId from the request parameters
+  const { quantity } = req.body;
  
   try {
     // Find the product by its short ID
@@ -60,7 +143,7 @@ export const updateProductQuantity = async (req: Request, res: Response) => {
     }
  
     // Calculate the new quantity based on the current quantity and restock quantity
-    const newQuantity = product.productQuantity + product.restockQuantity;
+    const newQuantity = product.productQuantity + quantity;
  
     // Update the product quantity
     product.productQuantity = newQuantity;

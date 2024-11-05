@@ -3,6 +3,17 @@ import { Request, Response } from 'express';
 import Order from '../models/Order';
 import { getCustomerByShortId } from '../service/customerServiceClient'; // Import the updated customer service client
 
+export const getTotalOrders = async (req: Request, res: Response) => {
+  const { branchShortId } = req.params;
+
+  try {
+    const totalOrders = await Order.countDocuments({ branchShortId });
+    res.json({ totalOrders });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching total orders', error });
+  }
+};
+
 // Create Order Controller
 export const createOrder = async (req: Request, res: Response): Promise<void> => {
   try {

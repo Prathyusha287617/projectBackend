@@ -17,10 +17,23 @@ import {
   getProductsByBranch,
   getProductByHeaderShortId,
   updateProductStockQuantity,
-  getAllProductsForBusinessRetailer
+  getAllProductsForBusinessRetailer,
+  getQuantityHistory,
+  getProductQuantityHistory,
+  getAllProductShortIds,
+  getProductCountByBrandAndBranch,
+  getTotalProducts
 } from '../controller/productController';
 
 const router = express.Router();
+
+router.get('/count/:branchShortId', getTotalProducts);
+router.get('/all-product-ids', getAllProductShortIds);
+// productRoutes.ts
+router.get('/quantity-history/:productShortId', getProductQuantityHistory as any);
+
+// Define the route for fetching quantity history
+router.get('/api/product/quantity-history/:productShortId', getQuantityHistory as any);
 
 router.get('/all',  getAllProductsForBusinessRetailer as any);
 router.get('/id', getProductByHeaderShortId as any);
@@ -45,6 +58,8 @@ router.post('/products/:productShortId/restock', triggerRestockRequest as any);
 router.put('/products/:productShortId', updateProductDetails as any);
 
 router.get('/branch/:branchShortId', getProductsByBranch as any);
+
+router.get('/count/:branchShortId/:brandName', getProductCountByBrandAndBranch as any);
 // Route to get a product by short ID from headers
 
 
