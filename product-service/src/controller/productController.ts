@@ -3,6 +3,19 @@ import { Request, Response } from 'express';
 import Product from '../models/productModel';
 import axios from 'axios';
 
+// Fetch all products if the user is a business retailer
+export const getAllProductsForBusinessRetailer = async (req: Request, res: Response) => {
+  try {
+
+    // Fetch all products from all branches
+    const products = await Product.find();
+    return res.status(200).json(products);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ message: 'Server error: unable to fetch products.' });
+  }
+};
+
 export const updateProductStockQuantity = async (req: Request, res: Response) => {
   const { productShortId } = req.params; // Get the productShortId from the request parameters
   const { quantity } = req.body; // Get the quantity to reduce from the request body

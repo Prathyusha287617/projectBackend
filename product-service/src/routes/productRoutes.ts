@@ -16,14 +16,17 @@ import {
   updateProductDetails,
   getProductsByBranch,
   getProductByHeaderShortId,
-  updateProductStockQuantity
+  updateProductStockQuantity,
+  getAllProductsForBusinessRetailer
 } from '../controller/productController';
 
 const router = express.Router();
 
+router.get('/all',  getAllProductsForBusinessRetailer as any);
 router.get('/id', getProductByHeaderShortId as any);
 router.put('/shortId/:productShortId', updateProductQuantity as any);
 router.put('/:productShortId', updateProductStockQuantity as any);
+
 
 router.post('/', createProduct); // Create a new product
 router.get('/', getAllProducts); // Get all products
