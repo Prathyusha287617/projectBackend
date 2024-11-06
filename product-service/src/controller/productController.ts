@@ -3,6 +3,23 @@ import { Request, Response } from 'express';
 import Product from '../models/productModel';
 import axios from 'axios';
 
+// Controller function for getting aging products by category
+export const getAgingProductsByCategory = async (req: Request, res: Response): Promise<void> => {
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 1);
+
+  try {
+    const agingProducts = await Product.aggregate([
+      { $match: { updatedAt: { $lt: thirtyDaysAgo } } }, // Products not updated in the last 30 days
+      { $group: { _id: '$category', agingCount: { $sum: 1 } } }, // Group by category with count
+    ]);
+
+    res.status(200).json({ success: true, data: agingProducts });
+  } catch (error) {
+    console.error('Error fetching aging products:', error);
+    res.status(500).json({ success: false, message: 'Failed to retrieve aging products' });
+  }
+};
 
 // Controller method to fetch the total count of all products
 export const fetchTotalProductCount = async (req: Request, res: Response) => {

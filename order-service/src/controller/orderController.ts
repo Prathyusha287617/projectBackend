@@ -3,6 +3,110 @@ import { Request, Response } from 'express';
 import Order from '../models/Order';
 import { getCustomerByShortId } from '../service/customerServiceClient'; // Import the updated customer service client
 
+// Method to get most orders based on dates for a specific branch using branchShortId
+export const getMostOrdersByDate = async (req: Request, res: Response) => {
+  const { branchShortId } = req.params;
+
+  try {
+    const orders = await Order.aggregate([
+      { $match: { branchShortId } }, // Match by branchShortId
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$orderDate" } }, // Group by date
+          totalOrders: { $sum: 1 }, // Count the number of orders for each date
+        },
+      },
+      { $sort: { _id: -1 } }, // Sort by date in descending order
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: orders,
+    });
+  } catch (error) {
+    console.error('Error fetching most orders by date:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching most orders by date',
+    });
+  }
+};
+
+// Method to fetch all orders from all branches
+export const getAllOrdersOfBranches = async (req: Request, res: Response) => {
+  try {
+    const orders = await Order.find();
+
+    res.status(200).json({
+      success: true,
+      data: orders,
+    });
+  } catch (error) {
+    console.error('Error fetching all orders:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching all orders',
+    });
+  }
+};
+
+// Controller to handle fetching order statistics by branchShortId
+export const getOrderStatsByBranchShortId = async (req:Request, res:Response) => {
+  const { branchShortId } = req.params; // Extract branchShortId from the URL parameter
+
+  try {
+    // Fetch order statistics for the given branchShortId
+    const orderStats = await Order.find({ branchShortId });
+
+    if (orderStats.length === 0) {
+      return res.status(404).json({ message: 'No order stats found for this branch' });
+    }
+
+    // Return the order stats data
+    res.json(orderStats);
+  } catch (error:any) {
+    res.status(500).json({ message: 'Failed to fetch order stats', error: error.message });
+  }
+};
+
+export const getOrderStatsByBranch = async (req: Request, res: Response) => {
+  try {
+    // Aggregate orders by branchShortId
+    const orderStats = await Order.aggregate([
+      {
+        $group: {
+          _id: "$branchShortId",  // Group by branchShortId
+          totalOrders: { $sum: 1 },  // Count the number of orders
+          totalRevenue: { $sum: "$totalPrice" },  // Sum the total revenue
+        }
+      },
+      {
+        $project: {
+          branchShortId: "$_id",
+          totalOrders: 1,
+          totalRevenue: 1,
+          _id: 0
+        }
+      }
+    ]);
+
+    res.json(orderStats);  // Return the result to frontend
+  } catch (error) {
+    res.status(500).send('Error fetching order stats');
+  }
+};
+
+// Method to fetch orders by branchShortId
+export const getOrdersByBranch = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { branchShortId } = req.params;
+    const orders = await Order.find({ branchShortId });
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching orders', error });
+  }
+};
+
 // Controller method to fetch count of all orders
 export const fetchTotalOrderCount = async (req: Request, res: Response) => {
   try {

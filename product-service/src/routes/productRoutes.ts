@@ -23,11 +23,14 @@ import {
   getAllProductShortIds,
   getProductCountByBrandAndBranch,
   getTotalProducts,
-  fetchTotalProductCount
+  fetchTotalProductCount,
+  getAgingProductsByCategory
 } from '../controller/productController';
 
 const router = express.Router();
 
+// Define route to get aging products by category
+router.get('/aging-by-category', getAgingProductsByCategory);
 router.get('/count/all',fetchTotalProductCount)
 router.get('/count/:branchShortId', getTotalProducts);
 router.get('/all-product-ids', getAllProductShortIds);

@@ -10,7 +10,7 @@ export interface IOrder extends Document {
   quantity: number;
   totalPrice: number;
   orderDate: Date;
-  transactionStatus: 'Pending' | 'Completed' | 'Cancelled';
+  transactionStatus: 'Pending' | 'Completed';
 
 }
 

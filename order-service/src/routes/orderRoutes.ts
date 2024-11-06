@@ -10,11 +10,29 @@ import {
     deleteOrderByShortId,
     getAllOrders,
     getTotalOrders,
-    fetchTotalOrderCount
+    fetchTotalOrderCount,
+    getOrdersByBranch,
+    getOrderStatsByBranch,
+    getOrderStatsByBranchShortId,
+    getMostOrdersByDate,
+    getAllOrdersOfBranches,
 } from '../controller/orderController';
 
 const router = express.Router();
 
+// Route for fetching most orders based on dates for a specific branch
+router.get('/branch/:branchShortId/date-orders', getMostOrdersByDate);
+
+// Route for fetching all orders from all branches
+router.get('/all', getAllOrdersOfBranches);
+// Route to get order status counts by branch
+router.get('/status-counts/:branchShortId', getOrderStatsByBranch);
+// Route for fetching order stats by branchShortId
+router.get('/order-stats/:branchShortId', getOrderStatsByBranchShortId as any);
+// Define the route for fetching order stats by branch
+router.get('/order-stats', getOrderStatsByBranch);
+// Route to get orders by branchShortId
+router.get('/branch/:branchShortId', getOrdersByBranch);
 router.get('/count/all', fetchTotalOrderCount);
 router.get('/count/:branchShortId', getTotalOrders);
 // Existing routes
