@@ -22,11 +22,13 @@ import {
   getProductQuantityHistory,
   getAllProductShortIds,
   getProductCountByBrandAndBranch,
-  getTotalProducts
+  getTotalProducts,
+  fetchTotalProductCount
 } from '../controller/productController';
 
 const router = express.Router();
 
+router.get('/count/all',fetchTotalProductCount)
 router.get('/count/:branchShortId', getTotalProducts);
 router.get('/all-product-ids', getAllProductShortIds);
 // productRoutes.ts

@@ -37,6 +37,10 @@ const productSchema = new Schema<IProduct>(
   },
   { timestamps: true }
 );
+// Static method to get the total count of all products
+productSchema.statics.totalProductCount = async function () {
+  return await this.countDocuments();
+};
 
 // Pre-save middleware to handle productShortId, profit, and needsRestock
 productSchema.pre<IProduct>('save', async function (next) {

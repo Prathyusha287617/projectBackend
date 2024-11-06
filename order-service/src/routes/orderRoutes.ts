@@ -9,11 +9,13 @@ import {
     updateOrderByShortId,
     deleteOrderByShortId,
     getAllOrders,
-    getTotalOrders
+    getTotalOrders,
+    fetchTotalOrderCount
 } from '../controller/orderController';
 
 const router = express.Router();
 
+router.get('/count/all', fetchTotalOrderCount);
 router.get('/count/:branchShortId', getTotalOrders);
 // Existing routes
 router.post('/', createOrder);

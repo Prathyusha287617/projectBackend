@@ -9,11 +9,13 @@ import {
    getCustomerOrders,
    checkCustomerByEmail,
    addCustomerByEmail,
-   getTotalCustomers
+   getTotalCustomers,
+   fetchTotalCustomerCount
 } from '../controller/customerController'; // Adjust the import according to your folder structure
  
 const customerRouter = Router();
  
+customerRouter.get('/count/all', fetchTotalCustomerCount);
 customerRouter.get('/count/:branchShortId', getTotalCustomers);
 customerRouter.get('/checkCustomer',checkCustomerByEmail as any);
 customerRouter.post('/addCustomer', addCustomerByEmail);

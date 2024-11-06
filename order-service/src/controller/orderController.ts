@@ -3,6 +3,17 @@ import { Request, Response } from 'express';
 import Order from '../models/Order';
 import { getCustomerByShortId } from '../service/customerServiceClient'; // Import the updated customer service client
 
+// Controller method to fetch count of all orders
+export const fetchTotalOrderCount = async (req: Request, res: Response) => {
+  try {
+      const count = await Order.countDocuments();
+      res.status(200).json({ totalOrders: count });
+  } catch (error) {
+      console.error('Error fetching total order count:', error);
+      res.status(500).json({ message: 'Failed to fetch total order count' });
+  }
+};
+
 export const getTotalOrders = async (req: Request, res: Response) => {
   const { branchShortId } = req.params;
 

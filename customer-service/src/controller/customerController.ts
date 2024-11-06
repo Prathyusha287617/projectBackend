@@ -14,6 +14,17 @@ export const getTotalCustomers = async (req: Request, res: Response) => {
     }
   };
 
+  // Controller method to fetch count of all customers
+export const fetchTotalCustomerCount = async (req: Request, res: Response) => {
+    try {
+        const customerCount = await Customer.countDocuments();
+        res.status(200).json({ totalCustomers: customerCount });
+    } catch (error) {
+        console.error('Error fetching customer count:', error);
+        res.status(500).json({ message: 'Failed to fetch customer count' });
+    }
+};
+
 // 1. Create a Customer
 export const createCustomer = async (req: Request, res: Response): Promise<void> => {
     try {

@@ -23,7 +23,10 @@ const customerSchema = new Schema<ICustomer>(
     },
     { timestamps: true } // Automatically manage createdAt and updatedAt
 );
-
+// Static method to get the total count of all products
+customerSchema.statics.totalCustomerCount = async function () {
+    return await this.countDocuments();
+  };
 // Pre-save hook for generating customerShortId
 customerSchema.pre<ICustomer>('save', async function (next) {
         // Only generate customerShortId if it's not already set

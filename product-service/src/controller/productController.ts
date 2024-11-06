@@ -4,6 +4,17 @@ import Product from '../models/productModel';
 import axios from 'axios';
 
 
+// Controller method to fetch the total count of all products
+export const fetchTotalProductCount = async (req: Request, res: Response) => {
+  try {
+      const count = await Product.countDocuments(); // Directly using countDocuments
+      res.status(200).json({ totalProducts: count });
+  } catch (error) {
+      console.error('Error fetching total product count:', error);
+      res.status(500).json({ message: 'Failed to fetch total product count' });
+  }
+};
+
 export const getTotalProducts = async (req: Request, res: Response) => {
   const { branchShortId } = req.params;
 
