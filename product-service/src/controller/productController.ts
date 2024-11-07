@@ -3,6 +3,22 @@ import { Request, Response } from 'express';
 import Product from '../models/productModel';
 import axios from 'axios';
 
+// Method to get the total count of products by branchShortId
+export const getProductCountsByBranch = async (req: Request, res: Response) => {
+  try {
+      // Aggregating to group by branchShortId and count products
+      const productCounts = await Product.aggregate([
+          { $unwind: "$branchShortId" },
+          { $group: { _id: "$branchShortId", totalProducts: { $sum: 1 } } },
+          { $project: { branchShortId: "$_id", totalProducts: 1, _id: 0 } }
+      ]);
+
+      res.status(200).json(productCounts);
+  } catch (error) {
+      console.error("Error fetching product counts by branch:", error);
+      res.status(500).json({ error: "An error occurred while fetching product counts by branch" });
+  }
+};
 // Controller function for getting aging products by category
 export const getAgingProductsByCategory = async (req: Request, res: Response): Promise<void> => {
   const thirtyDaysAgo = new Date();

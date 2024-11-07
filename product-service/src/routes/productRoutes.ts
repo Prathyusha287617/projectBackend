@@ -24,11 +24,14 @@ import {
   getProductCountByBrandAndBranch,
   getTotalProducts,
   fetchTotalProductCount,
-  getAgingProductsByCategory
+  getAgingProductsByCategory,
+  getProductCountsByBranch
 } from '../controller/productController';
 
 const router = express.Router();
 
+// Route to get product counts by branch
+router.get('/counts-by-branch', getProductCountsByBranch);
 // Define route to get aging products by category
 router.get('/aging-by-category', getAgingProductsByCategory);
 router.get('/count/all',fetchTotalProductCount)
